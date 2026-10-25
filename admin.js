@@ -1,781 +1,101 @@
-/**
- * EXCELLENCE COACHING CLASSES, GALLE BORGAON, MAHARASHTRA
- * Dedicated Administrative Router & Integrated Operations Console
- * File: admin.js
- */
-
-const express = require('express');
-const router = express.Router();
-
-router.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Operations Center | Excellence Coaching Classes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
-  <style>
-    :root {
-      --lavender: #A78BFA;
-      --lavender-light: #EDE9FE;
-      --sky-blue: #60A5FA;
-      --sky-light: #E0F2FE;
-      --mint: #6EE7B7;
-      --mint-light: #D1FAE5;
-      --coral: #FB7185;
-      --coral-light: #FFE4E6;
-      --sunshine: #FCD34D;
-      --navy: #1E293B;
-      --text-muted: #64748B;
-      --bg: #F8FAFC;
-      --white: #FFFFFF;
-      --radius-sm: 14px;
-      --radius-md: 20px;
-      --radius-lg: 28px;
-
-      --clay-box: 
-        8px 8px 18px rgba(167, 139, 250, 0.12),
-        -6px -6px 16px #FFFFFF,
-        inset 2px 2px 4px rgba(255, 255, 255, 0.9),
-        inset -2px -2px 4px rgba(167, 139, 250, 0.1);
-
-      --clay-btn-purple:
-        5px 5px 12px rgba(139, 92, 246, 0.35),
-        -3px -3px 8px #FFFFFF,
-        inset 1px 1px 2px rgba(255, 255, 255, 0.6);
-
-      --clay-input:
-        inset 3px 3px 6px rgba(167, 139, 250, 0.12),
-        inset -3px -3px 6px #FFFFFF;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
-    body { background-color: var(--bg); color: var(--navy); display: flex; min-height: 100vh; }
-    h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 700; }
-
-    /* Security Gatekeeper Login Overlay */
-    #gatekeeper {
-      display: flex; align-items: center; justify-content: center;
-      width: 100vw; height: 100vh; position: fixed; top: 0; left: 0;
-      background: #F1F5F9; z-index: 1000;
-    }
-    .gate-box {
-      background: white; border-radius: var(--radius-lg); padding: 40px;
-      max-width: 420px; width: 100%; box-shadow: var(--clay-box); text-align: center;
-    }
-
-    /* Admin Sidebar */
-    .sidebar {
-      width: 260px; background: white; border-right: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 4px 0 20px rgba(167, 139, 250, 0.08); padding: 24px 16px;
-      display: flex; flex-direction: column; justify-content: space-between;
-      position: sticky; top: 0; height: 100vh;
-    }
-    .side-nav { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 24px; }
-    .side-item {
-      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-      border-radius: var(--radius-sm); font-weight: 700; font-size: 0.9rem; color: var(--text-muted);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .side-item:hover, .side-item.active {
-      background: var(--lavender-light); color: #6D28D9; transform: translateX(3px);
-    }
-
-    /* Main Content Area */
-    .main-body { flex: 1; padding: 32px; overflow-y: auto; }
-    .clay-card {
-      background: var(--white); border-radius: var(--radius-md);
-      box-shadow: var(--clay-box); border: 2px solid rgba(255, 255, 255, 0.85);
-    }
-    .clay-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 20px; border: none;
-      font-weight: 700; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-purple { background: linear-gradient(135deg, #A78BFA, #8B5CF6); color: white; box-shadow: var(--clay-btn-purple); }
-    .btn-white { background: white; color: var(--navy); box-shadow: 3px 3px 8px rgba(167, 139, 250, 0.1), -2px -2px 6px #FFFFFF; }
-
-    .clay-input {
-      width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
-      border: 1px solid transparent; background: #F8FAFC;
-      box-shadow: var(--clay-input); font-weight: 600; outline: none;
-    }
-    .clay-input:focus { border-color: var(--lavender); background: white; }
-
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
-    .stat-card { padding: 20px; display: flex; align-items: center; gap: 16px; }
-
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { padding: 12px 16px; background: #F8FAFC; font-weight: 800; font-size: 0.82rem; }
-    td { padding: 12px 16px; border-top: 1px solid #F1F5F9; font-size: 0.88rem; font-weight: 600; }
-
-    @media (max-width: 900px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; position: static; }
-      .side-nav { flex-direction: row; flex-wrap: wrap; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ADMIN AUTH GATEKEEPER VIEW -->
-  <div id="gatekeeper">
-    <div class="gate-box">
-      <div style="width: 48px; height: 48px; border-radius: 16px; background: var(--lavender); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-        <i data-lucide="lock"></i>
-      </div>
-      <h3 style="margin-bottom: 8px;">Admin Gateway</h3>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px;">Excellence Coaching Classes • Galle Borgaon</p>
-
-      <form onsubmit="handleAdminLogin(event)">
-        <input type="text" id="adminIdent" class="clay-input" placeholder="Admin Email / Username" required style="margin-bottom: 12px;">
-        <input type="password" id="adminPass" class="clay-input" placeholder="Password" required style="margin-bottom: 18px;">
-        <button type="submit" class="clay-btn btn-purple" style="width: 100%;">Access Operations</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- AUTHENTICATED ADMIN OPERATIONS SIDEBAR -->
-  <aside class="sidebar">
-    <div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="width: 36px; height: 36px; border-radius: 12px; background: #8B5CF6; color: white; display: flex; align-items: center; justify-content: center;">
-          <i data-lucide="shield-check" style="width: 20px;"></i>
-        </div>
-        <div>
-          <div style="font-weight: 800; font-size: 0.95rem;">STAFF DESK</div>
-          <div style="font-size: 0.7rem; color: #8B5CF6; font-weight: 800;">GALLE BORGAON</div>
-        </div>
-      </div>
-
-      <ul class="side-nav">
-        <li class="side-item active" onclick="showTab('tab-dash')"><i data-lucide="layout-dashboard" style="width: 18px;"></i> Overview</li>
-        <li class="side-item" onclick="showTab('tab-enq')"><i data-lucide="users" style="width: 18px;"></i> Admissions</li>
-        <li class="side-item" onclick="showTab('tab-course')"><i data-lucide="book-open" style="width: 18px;"></i> Courses</li>
-        <li class="side-item" onclick="showTab('tab-tests')"><i data-lucide="check-square" style="width: 18px;"></i> Online Tests</li>
-        <li class="side-item" onclick="showTab('tab-resources')"><i data-lucide="file-text" style="width: 18px;"></i> Resources</li>
-        <li class="side-item" onclick="showTab('tab-announcements')"><i data-lucide="bell" style="width: 18px;"></i> Notices</li>
-        <li class="side-item" onclick="showTab('tab-students')"><i data-lucide="user-check" style="width: 18px;"></i> Students</li>
-      </ul>
-    </div>
-
-    <div>
-      <a href="/" target="_blank" class="clay-btn btn-white" style="width: 100%; margin-bottom: 8px; justify-content: center;">
-        <i data-lucide="external-link" style="width: 16px;"></i> Public Website
-      </a>
-      <button class="clay-btn btn-white" onclick="adminSignOut()" style="width: 100%; justify-content: center; color: #E11D48;">
-        <i data-lucide="log-out" style="width: 16px;"></i> Log Out
-      </button>
-    </div>
-  </aside>
-
-  <main class="main-body">
-    <!-- 1. OVERVIEW TAB -->
-    <div id="tab-dash">
-      <h2 style="margin-bottom: 20px;">Operations Overview</h2>
-
-      <div class="stat-grid">
-        <div class="clay-card stat-card">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--sky-light); color: #0284C7; display: flex; align-items: center; justify-content: center;"><i data-lucide="user-plus"></i></div>
-          <div>
-            <div style="font-size: 1.5rem; font-weight: 800;" id="stEnq">0</div>
-            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Enquiries</div>
-          </div>
-        </div>
-
-        <div class="clay-card stat-card">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--lavender-light); color: #7C3AED; display: flex; align-items: center; justify-content: center;"><i data-lucide="graduation-cap"></i></div>
-          <div>
-            <div style="font-size: 1.5rem; font-weight: 800;" id="stStudents">0</div>
-            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Students</div>
-          </div>
-        </div>
-
-        <div class="clay-card stat-card">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--mint-light); color: #059669; display: flex; align-items: center; justify-content: center;"><i data-lucide="book"></i></div>
-          <div>
-            <div style="font-size: 1.5rem; font-weight: 800;" id="stCourses">0</div>
-            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Courses</div>
-          </div>
-        </div>
-
-        <div class="clay-card stat-card">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--coral-light); color: #E11D48; display: flex; align-items: center; justify-content: center;"><i data-lucide="award"></i></div>
-          <div>
-            <div style="font-size: 1.5rem; font-weight: 800;" id="stAttempts">0</div>
-            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Exam Submissions</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="clay-card" style="padding: 24px;">
-        <h3 style="margin-bottom: 16px;">Recent Admission Applications</h3>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Student</th>
-                <th>Phone</th>
-                <th>Course</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="dashEnqTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. ENQUIRIES TAB -->
-    <div id="tab-enq" style="display: none;">
-      <div class="clay-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3>Admission Enquiries Desk</h3>
-          <a href="/api/admin/export/enquiries" class="clay-btn btn-purple"><i data-lucide="download"></i> Export CSV</a>
-        </div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Ref</th>
-                <th>Student</th>
-                <th>Phone</th>
-                <th>Course</th>
-                <th>Update Status</th>
-                <th>Quick Chat</th>
-              </tr>
-            </thead>
-            <tbody id="allEnqTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. COURSES TAB -->
-    <div id="tab-course" style="display: none;">
-      <div class="clay-card" style="padding: 24px; margin-bottom: 24px;">
-        <h3 style="margin-bottom: 16px;">Add New Academic Course</h3>
-        <form onsubmit="handleNewCourse(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <input type="text" id="cTitle" class="clay-input" placeholder="Course Title" required>
-          <input type="text" id="cClass" class="clay-input" placeholder="Target Class (e.g. 11th & 12th)">
-          <input type="number" id="cFee" class="clay-input" placeholder="Fee (₹)" required>
-          <input type="text" id="cDur" class="clay-input" placeholder="Duration (e.g. 1 Year)">
-          <div style="grid-column: span 2;">
-            <input type="text" id="cDesc" class="clay-input" placeholder="Syllabus Overview">
-          </div>
-          <button type="submit" class="clay-btn btn-purple" style="width: 140px;">Add Course</button>
-        </form>
-      </div>
-
-      <div class="clay-card" style="padding: 24px;">
-        <h3 style="margin-bottom: 16px;">Active Courses</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Class</th>
-              <th>Fee</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="coursesAdminTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 4. TESTS AUTHORING STUDIO TAB -->
-    <div id="tab-tests" style="display: none;">
-      <div class="clay-card" style="padding: 24px; margin-bottom: 24px;">
-        <h3 style="margin-bottom: 16px;">Create Timed MCQ Test</h3>
-        <form onsubmit="handleCreateAdminTest(event)">
-          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-            <input type="text" id="tTitle" class="clay-input" placeholder="Test Title (e.g. Wave Optics Mock 1)" required>
-            <input type="text" id="tSubject" class="clay-input" placeholder="Subject (Physics/Chemistry)" required>
-            <input type="number" id="tDuration" class="clay-input" placeholder="Duration (Mins)" value="20" required>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
-            <label style="font-weight: 700; font-size: 0.85rem;">
-              <input type="checkbox" id="tNegative" checked> Enable -0.25 Negative Marking (CET/NEET Format)
-            </label>
-          </div>
-
-          <div style="background: #F8FAFC; padding: 18px; border-radius: var(--radius-sm); margin-bottom: 16px; border: 1px solid #E2E8F0;">
-            <h4 style="font-size: 0.95rem; margin-bottom: 10px;">Question #1</h4>
-            <input type="text" id="tQText" class="clay-input" placeholder="Enter Question Stem" required style="margin-bottom: 10px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-              <input type="text" id="tOpt0" class="clay-input" placeholder="Option A" required>
-              <input type="text" id="tOpt1" class="clay-input" placeholder="Option B" required>
-              <input type="text" id="tOpt2" class="clay-input" placeholder="Option C" required>
-              <input type="text" id="tOpt3" class="clay-input" placeholder="Option D" required>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 700;">Correct Option:</label>
-                <select id="tCorrect" class="clay-input">
-                  <option value="0">Option A</option>
-                  <option value="1">Option B</option>
-                  <option value="2">Option C</option>
-                  <option value="3">Option D</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size: 0.8rem; font-weight: 700;">Solution / Explanation:</label>
-                <input type="text" id="tExp" class="clay-input" placeholder="e.g. Formula derived from Snell's law.">
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="clay-btn btn-purple">Publish Assessment</button>
-        </form>
-      </div>
-
-      <div class="clay-card" style="padding: 24px;">
-        <h3 style="margin-bottom: 16px;">Active Practice Tests</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Subject</th>
-              <th>Duration</th>
-              <th>Questions</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="testsAdminTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 5. STUDY MATERIAL TAB -->
-    <div id="tab-resources" style="display: none;">
-      <div class="clay-card" style="padding: 24px; margin-bottom: 24px;">
-        <h3 style="margin-bottom: 16px;">Add Study Material / Notes</h3>
-        <form onsubmit="handleNewResource(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-          <input type="text" id="rTitle" class="clay-input" placeholder="Resource Title (e.g. Electrostatics Notes)" required>
-          <input type="text" id="rSubject" class="clay-input" placeholder="Subject (Physics/Maths)" required>
-          <input type="text" id="rClass" class="clay-input" placeholder="Target Class (Class 11/12)" required>
-          <input type="url" id="rUrl" class="clay-input" placeholder="Direct PDF Document URL" required>
-          <div style="grid-column: span 2;">
-            <input type="text" id="rDesc" class="clay-input" placeholder="Brief Description / Topics Covered">
-          </div>
-          <button type="submit" class="clay-btn btn-purple" style="width: 160px;">Upload Resource</button>
-        </form>
-      </div>
-
-      <div class="clay-card" style="padding: 24px;">
-        <h3 style="margin-bottom: 16px;">Available Notes & Formula Sheets</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Subject</th>
-              <th>Class</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="resourcesAdminTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 6. CAMPUS ANNOUNCEMENTS TAB -->
-    <div id="tab-announcements" style="display: none;">
-      <div class="clay-card" style="padding: 24px; margin-bottom: 24px;">
-        <h3 style="margin-bottom: 16px;">Publish Campus Announcement</h3>
-        <form onsubmit="handleNewAnnouncement(event)" style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
-          <input type="text" id="aTitle" class="clay-input" placeholder="Announcement Title" required>
-          <input type="text" id="aCat" class="clay-input" placeholder="Category (Exams/Holidays/Admissions)">
-          <div style="grid-column: span 2;">
-            <textarea id="aDesc" class="clay-input" rows="2" placeholder="Full notice message for students and parents..." required></textarea>
-          </div>
-          <button type="submit" class="clay-btn btn-purple" style="width: 160px;">Post Notice</button>
-        </form>
-      </div>
-
-      <div class="clay-card" style="padding: 24px;">
-        <h3 style="margin-bottom: 16px;">Published Notices</h3>
-        <div id="annAdminList" style="display: flex; flex-direction: column; gap: 12px;"></div>
-      </div>
-    </div>
-
-    <!-- 7. REGISTERED STUDENTS TAB -->
-    <div id="tab-students" style="display: none;">
-      <div class="clay-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3>Registered Student Accounts</h3>
-          <input type="text" id="stuSearch" class="clay-input" placeholder="Search by name, phone..." style="width: 240px;" oninput="filterStudents()">
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Registered</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="studentsAdminTbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    lucide.createIcons();
-
-    document.addEventListener('DOMContentLoaded', () => {
-      verifyAdmin();
-    });
-
-    async function verifyAdmin() {
-      const res = await fetch('/api/auth/me');
-      const data = await res.json();
-      if (data.authenticated && data.user.role === 'admin') {
-        document.getElementById('gatekeeper').style.display = 'none';
-        loadDashboardMetrics();
-        loadAllEnquiries();
-        loadAdminCourses();
-        loadAdminTests();
-        loadAdminResources();
-        loadAdminAnnouncements();
-        loadAdminStudents();
-      } else {
-        document.getElementById('gatekeeper').style.display = 'flex';
-      }
-    }
-
-    async function handleAdminLogin(e) {
-      e.preventDefault();
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identifier: document.getElementById('adminIdent').value,
-          password: document.getElementById('adminPass').value
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.user.role === 'admin') {
-        document.getElementById('gatekeeper').style.display = 'none';
-        loadDashboardMetrics();
-        loadAllEnquiries();
-        loadAdminCourses();
-        loadAdminTests();
-        loadAdminResources();
-        loadAdminAnnouncements();
-        loadAdminStudents();
-      } else {
-        alert(data.message || 'Staff verification failed');
-      }
-    }
-
-    function showTab(id) {
-      const tabs = ['tab-dash', 'tab-enq', 'tab-course', 'tab-tests', 'tab-resources', 'tab-announcements', 'tab-students'];
-      tabs.forEach(t => {
-        const el = document.getElementById(t);
-        if (el) el.style.display = (t === id) ? 'block' : 'none';
-      });
-      document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-    }
-
-    async function loadDashboardMetrics() {
-      const res = await fetch('/api/admin/metrics');
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('stEnq').innerText = data.metrics.enquiries;
-        document.getElementById('stStudents').innerText = data.metrics.students;
-        document.getElementById('stCourses').innerText = data.metrics.courses;
-        document.getElementById('stAttempts').innerText = data.metrics.attempts;
-
-        const tbody = document.getElementById('dashEnqTbody');
-        tbody.innerHTML = '';
-        data.recentEnquiries.forEach(eq => {
-          tbody.innerHTML += \`
-            <tr>
-              <td><strong>\${eq.referenceNumber}</strong></td>
-              <td>\${eq.studentName}</td>
-              <td>\${eq.phone}</td>
-              <td>\${eq.desiredCourse}</td>
-              <td>\${eq.status}</td>
-            </tr>
-          \`;
-        });
-        lucide.createIcons();
-      }
-    }
-
-    async function loadAllEnquiries() {
-      const res = await fetch('/api/admin/enquiries');
-      const data = await res.json();
-      const tbody = document.getElementById('allEnqTbody');
-      tbody.innerHTML = '';
-      (data.enquiries || []).forEach(eq => {
-        tbody.innerHTML += \`
-          <tr>
-            <td><strong>\${eq.referenceNumber}</strong></td>
-            <td>\${eq.studentName}</td>
-            <td><a href="tel:\${eq.phone}">\${eq.phone}</a></td>
-            <td>\${eq.desiredCourse}</td>
-            <td>
-              <select onchange="changeStatus('\${eq._id}', this.value)" style="padding: 4px 8px; border-radius: 8px;">
-                <option value="New" \${eq.status==='New'?'selected':''}>New</option>
-                <option value="Contacted" \${eq.status==='Contacted'?'selected':''}>Contacted</option>
-                <option value="Admitted" \${eq.status==='Admitted'?'selected':''}>Admitted</option>
-              </select>
-            </td>
-            <td>
-              <a href="https://wa.me/91\${eq.phone}" target="_blank" style="color: #059669; font-weight: 700;">WhatsApp</a>
-            </td>
-          </tr>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    async function changeStatus(id, val) {
-      await fetch('/api/admin/enquiries/' + id, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: val })
-      });
-      loadDashboardMetrics();
-    }
-
-    async function loadAdminCourses() {
-      const res = await fetch('/api/courses');
-      const data = await res.json();
-      const tbody = document.getElementById('coursesAdminTbody');
-      tbody.innerHTML = '';
-      (data.courses || []).forEach(c => {
-        tbody.innerHTML += \`
-          <tr>
-            <td>\${c.title}</td>
-            <td>\${c.targetClass}</td>
-            <td>₹\${Number(c.fee).toLocaleString('en-IN')}</td>
-            <td>
-              <button onclick="delCourse('\${c._id}')" class="clay-btn btn-white" style="color: #E11D48; padding: 4px 10px;">Delete</button>
-            </td>
-          </tr>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    async function handleNewCourse(e) {
-      e.preventDefault();
-      await fetch('/api/admin/courses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: document.getElementById('cTitle').value,
-          targetClass: document.getElementById('cClass').value,
-          fee: document.getElementById('cFee').value,
-          duration: document.getElementById('cDur').value,
-          description: document.getElementById('cDesc').value
-        })
-      });
-      e.target.reset();
-      loadAdminCourses();
-      loadDashboardMetrics();
-    }
-
-    async function delCourse(id) {
-      if (!confirm('Delete this course?')) return;
-      await fetch('/api/admin/courses/' + id, { method: 'DELETE' });
-      loadAdminCourses();
-      loadDashboardMetrics();
-    }
-
-    async function loadAdminTests() {
-      const res = await fetch('/api/tests');
-      const data = await res.json();
-      const tbody = document.getElementById('testsAdminTbody');
-      tbody.innerHTML = '';
-      (data.tests || []).forEach(t => {
-        tbody.innerHTML += \`
-          <tr>
-            <td><strong>\${t.title}</strong></td>
-            <td>\${t.subject}</td>
-            <td>\${t.durationMinutes} Mins</td>
-            <td>\${t.questions ? t.questions.length : 0} Qs</td>
-            <td>
-              <button onclick="delTest('\${t._id}')" class="clay-btn btn-white" style="color: #E11D48; padding: 4px 10px;">Remove</button>
-            </td>
-          </tr>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    async function handleCreateAdminTest(e) {
-      e.preventDefault();
-      const payload = {
-        title: document.getElementById('tTitle').value,
-        subject: document.getElementById('tSubject').value,
-        durationMinutes: Number(document.getElementById('tDuration').value),
-        enableNegativeMarking: document.getElementById('tNegative').checked,
-        questions: [{
-          id: 'q_' + Date.now(),
-          text: document.getElementById('tQText').value,
-          options: [
-            document.getElementById('tOpt0').value,
-            document.getElementById('tOpt1').value,
-            document.getElementById('tOpt2').value,
-            document.getElementById('tOpt3').value
-          ],
-          correctAnswerIndex: Number(document.getElementById('tCorrect').value),
-          explanation: document.getElementById('tExp').value
-        }]
-      };
-      await fetch('/api/admin/tests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      e.target.reset();
-      loadAdminTests();
-      loadDashboardMetrics();
-    }
-
-    async function delTest(id) {
-      if (!confirm('Delete this test?')) return;
-      await fetch('/api/admin/tests/' + id, { method: 'DELETE' });
-      loadAdminTests();
-      loadDashboardMetrics();
-    }
-
-    async function loadAdminResources() {
-      const res = await fetch('/api/resources');
-      const data = await res.json();
-      const tbody = document.getElementById('resourcesAdminTbody');
-      tbody.innerHTML = '';
-      (data.resources || []).forEach(r => {
-        tbody.innerHTML += \`
-          <tr>
-            <td><strong>\${r.title}</strong></td>
-            <td>\${r.subject}</td>
-            <td>\${r.targetClass}</td>
-            <td>
-              <button onclick="delResource('\${r._id}')" class="clay-btn btn-white" style="color: #E11D48; padding: 4px 10px;">Delete</button>
-            </td>
-          </tr>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    async function handleNewResource(e) {
-      e.preventDefault();
-      await fetch('/api/admin/resources', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: document.getElementById('rTitle').value,
-          subject: document.getElementById('rSubject').value,
-          targetClass: document.getElementById('rClass').value,
-          fileUrl: document.getElementById('rUrl').value,
-          description: document.getElementById('rDesc').value
-        })
-      });
-      e.target.reset();
-      loadAdminResources();
-    }
-
-    async function delResource(id) {
-      if (!confirm('Remove this resource?')) return;
-      await fetch('/api/admin/resources/' + id, { method: 'DELETE' });
-      loadAdminResources();
-    }
-
-    async function loadAdminAnnouncements() {
-      const res = await fetch('/api/announcements');
-      const data = await res.json();
-      const div = document.getElementById('annAdminList');
-      div.innerHTML = '';
-      (data.announcements || []).forEach(a => {
-        div.innerHTML += \`
-          <div class="clay-card" style="padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>\${a.title}</strong>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">\${a.description}</p>
-            </div>
-            <button onclick="delAnnouncement('\${a._id}')" class="clay-btn btn-white" style="color: #E11D48; padding: 4px 10px;">Delete</button>
-          </div>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    async function handleNewAnnouncement(e) {
-      e.preventDefault();
-      await fetch('/api/admin/announcements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: document.getElementById('aTitle').value,
-          category: document.getElementById('aCat').value,
-          description: document.getElementById('aDesc').value
-        })
-      });
-      e.target.reset();
-      loadAdminAnnouncements();
-    }
-
-    async function delAnnouncement(id) {
-      if (!confirm('Remove this announcement?')) return;
-      await fetch('/api/admin/announcements/' + id, { method: 'DELETE' });
-      loadAdminAnnouncements();
-    }
-
-    let allStudentsCache = [];
-    async function loadAdminStudents() {
-      const res = await fetch('/api/admin/students');
-      const data = await res.json();
-      allStudentsCache = data.students || [];
-      renderStudentsTable(allStudentsCache);
-    }
-
-    function renderStudentsTable(list) {
-      const tbody = document.getElementById('studentsAdminTbody');
-      tbody.innerHTML = '';
-      list.forEach(s => {
-        tbody.innerHTML += \`
-          <tr>
-            <td><strong>\${s.fullName}</strong></td>
-            <td>\${s.phone}</td>
-            <td>\${s.email}</td>
-            <td>\${new Date(s.createdAt).toLocaleDateString()}</td>
-            <td>
-              <a href="tel:\${s.phone}" class="clay-btn btn-white" style="padding: 4px 10px; font-size: 0.8rem;">Call</a>
-            </td>
-          </tr>
-        \`;
-      });
-      lucide.createIcons();
-    }
-
-    function filterStudents() {
-      const q = document.getElementById('stuSearch').value.toLowerCase();
-      const filtered = allStudentsCache.filter(s => 
-        s.fullName.toLowerCase().includes(q) || s.phone.includes(q) || s.email.toLowerCase().includes(q)
-      );
-      renderStudentsTable(filtered);
-    }
-
-    async function adminSignOut() {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.reload();
-    }
-  </script>
-</body>
-</html>`);
-});
-module.exports = router;
+'use strict';
+// Admin interface (HTML + CSS + client JS). Served by index.js at /admin.
+// All authorization is enforced server-side on /api/admin/*; this file is only the UI.
+module.exports = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin – Excellence Coaching Classes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Crect width='8' height='8' rx='2' fill='%23A78BFA'/%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,'Segoe UI',sans-serif;background:#F7F5FF;color:#202A44}
+.clay{background:linear-gradient(145deg,#fff,#efeaff);border-radius:26px;box-shadow:10px 10px 22px rgba(167,139,250,.25),-7px -7px 16px #fff,inset 3px 3px 7px #fff,inset -4px -4px 9px rgba(167,139,250,.15)}
+.btn{border:0;border-radius:999px;padding:.6rem 1.2rem;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(145deg,#b9a3ff,#8b6cf0);box-shadow:4px 4px 10px rgba(139,108,240,.4),inset 2px 2px 5px rgba(255,255,255,.5);text-decoration:none;display:inline-block;font-size:.95rem}
+.btn:active{transform:translateY(2px)}.btn.red{background:linear-gradient(145deg,#ff9fb0,#fb7185)}.btn.sm{padding:.3rem .8rem;font-size:.8rem}
+:focus-visible{outline:3px solid #202A44;outline-offset:2px}
+input,select,textarea{font:inherit;padding:.6rem .9rem;border:0;border-radius:14px;background:#f3f0ff;box-shadow:inset 3px 3px 6px rgba(167,139,250,.25),inset -3px -3px 6px #fff;width:100%}
+label{display:grid;gap:.25rem;font-weight:700;margin-bottom:.7rem}.err{color:#be123c;font-size:.85rem}
+#login{max-width:380px;margin:12vh auto;padding:2rem}
+#app{display:none;grid-template-columns:230px 1fr;min-height:100vh}
+aside{padding:1.2rem;margin:.8rem;display:flex;flex-direction:column;gap:.5rem;height:calc(100vh - 1.6rem);position:sticky;top:.8rem}
+aside button.nav{background:none;border:0;text-align:left;padding:.7rem 1rem;border-radius:16px;font:700 1rem inherit;cursor:pointer;color:inherit}
+aside button.nav.on{background:#e6defe}main{padding:1rem;min-width:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1rem}.cards div{padding:1.2rem}.cards b{font-size:2rem;display:block}
+.wrap{overflow-x:auto;padding:1rem}table{width:100%;border-collapse:collapse;min-width:640px}th,td{text-align:left;padding:.6rem;border-bottom:1px solid #e3dcfb;font-size:.92rem}
+.bar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center}.bar input,.bar select{width:auto;flex:1;min-width:140px}
+dialog{border:0;border-radius:26px;padding:1.5rem;max-width:480px;width:92%}dialog::backdrop{background:rgba(32,42,68,.5)}
+#toast{position:fixed;bottom:1rem;right:1rem;padding:1rem 1.3rem;display:none;z-index:99}
+#menu{display:none;position:fixed;top:.6rem;left:.6rem;z-index:20}
+@media(max-width:800px){#app{grid-template-columns:1fr}aside{position:fixed;left:0;top:0;z-index:15;transform:translateX(-120%);transition:transform .25s;width:230px;height:calc(100vh - 1.6rem)}aside.open{transform:none}#menu{display:block}main{padding-top:3.5rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<button id="menu" class="btn" aria-label="Open menu">☰</button>
+<form id="login" class="clay"><h1>Admin sign in</h1><label>Email<input name="identifier" type="email" required autocomplete="username"></label>
+<label>Password<input name="password" type="password" required autocomplete="current-password"></label><div class="err" id="lerr" role="alert"></div><button class="btn">Sign in</button></form>
+<div id="app"><aside class="clay"><b>🎓 Admin</b>
+<button class="nav on" data-v="dash">Dashboard</button><button class="nav" data-v="enq">Enquiries</button><button class="nav" data-v="crs">Courses</button>
+<a class="btn" href="/">View site</a><button class="btn red" id="out">Log out</button></aside>
+<main id="view" aria-live="polite"></main></div>
+<dialog id="dlg" class="clay"></dialog><div id="toast" class="clay" role="status"></div>
+<script nonce="__N__">
+var $=function(s){return document.querySelector(s)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return '&#'+c.charCodeAt(0)+';'})}
+function toast(m){var t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){t.style.display='none'},4000)}
+function api(path,opt){
+  opt=opt||{};opt.headers={'Content-Type':'application/json','X-Requested-With':'fetch'};
+  if(opt.body&&typeof opt.body!=='string')opt.body=JSON.stringify(opt.body);
+  return fetch(path,opt).then(function(r){return r.json().catch(function(){return{}}).then(function(j){
+    if(r.status===401&&path!=='/api/admin/login'){showLogin();throw new Error('Session expired. Please sign in again.')}
+    if(!r.ok){var e=new Error(j.error||'Request failed');e.fields=j.fields;throw e}return j})})
+}
+function showLogin(){$('#app').style.display='none';$('#login').style.display='block'}
+function showApp(){$('#login').style.display='none';$('#app').style.display='grid';go('dash')}
+$('#login').onsubmit=function(e){e.preventDefault();$('#lerr').textContent='';
+  api('/api/admin/login',{method:'POST',body:Object.fromEntries(new FormData(e.target))}).then(showApp).catch(function(x){$('#lerr').textContent=x.message})};
+$('#out').onclick=function(){api('/api/admin/logout',{method:'POST'}).then(showLogin)};
+$('#menu').onclick=function(){document.querySelector('aside').classList.toggle('open')};
+document.querySelectorAll('.nav').forEach(function(b){b.onclick=function(){go(b.dataset.v);document.querySelector('aside').classList.remove('open')}});
+function go(v){
+  document.querySelectorAll('.nav').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});
+  $('#view').innerHTML='<div class="clay wrap">Loading…</div>';
+  ({dash:dash,enq:function(){enq(1)},crs:crs})[v]();
+}
+function fail(x){$('#view').innerHTML='<div class="clay wrap err">'+esc(x.message)+' <button class="btn sm" onclick="location.reload()">Retry</button></div>'}
+function dash(){api('/api/admin/dashboard').then(function(d){
+  var c=[['Student accounts',d.students],['New enquiries',d.newEnquiries],['Pending applications',d.pendingApplications],['Published courses',d.publishedCourses]];
+  $('#view').innerHTML='<h1>Dashboard</h1><div class="cards">'+c.map(function(x){return '<div class="clay">'+esc(x[0])+'<b>'+esc(x[1])+'</b></div>'}).join('')+'</div><div class="clay wrap"><h2>Recent enquiries</h2>'+
+  (d.recentEnquiries.length?'<table><tr><th>Ref</th><th>Student</th><th>Status</th><th>Date</th></tr>'+d.recentEnquiries.map(function(r){return '<tr><td>'+esc(r.referenceNumber)+'</td><td>'+esc(r.studentName)+'</td><td>'+esc(r.status)+'</td><td>'+new Date(r.createdAt).toLocaleDateString()+'</td></tr>'}).join('')+'</table>':'<p>No enquiries yet.</p>')+'</div>'}).catch(fail)}
+var q='',st='';
+function enq(p){
+  api('/api/admin/enquiries?page='+p+'&q='+encodeURIComponent(q)+'&status='+st).then(function(d){
+    $('#view').innerHTML='<h1>Enquiries</h1><div class="bar"><input id="sq" placeholder="Search name, phone, reference" aria-label="Search" value="'+esc(q)+'"><select id="ss" aria-label="Status filter">'+
+    ['','new','contacted','admitted','closed'].map(function(s){return '<option value="'+s+'"'+(s===st?' selected':'')+'>'+(s||'All statuses')+'</option>'}).join('')+'</select><button class="btn sm" id="go">Search</button><a class="btn sm" href="/api/admin/export/enquiries">Export CSV</a></div><div class="clay wrap">'+
+    (d.items.length?'<table><tr><th>Ref</th><th>Student</th><th>Phone</th><th>Class</th><th>Status</th><th></th></tr>'+d.items.map(function(r){return '<tr><td>'+esc(r.referenceNumber)+'</td><td>'+esc(r.studentName)+'<br><small>'+esc(r.parentName)+'</small></td><td><a href="tel:'+esc(r.phone)+'">'+esc(r.phone)+'</a></td><td>'+esc(r.currentClass)+'</td><td>'+esc(r.status)+'</td><td><button class="btn sm" data-id="'+esc(r._id)+'">Open</button></td></tr>'}).join('')+'</table>':'<p>No enquiries match.</p>')+
+    '<p>Page '+d.page+' of '+Math.max(d.pages,1)+' ('+d.total+' total) <button class="btn sm" id="pv"'+(p<=1?' disabled':'')+'>Prev</button> <button class="btn sm" id="nx"'+(p>=d.pages?' disabled':'')+'>Next</button></p></div>';
+    $('#go').onclick=function(){q=$('#sq').value;st=$('#ss').value;enq(1)};
+    $('#pv').onclick=function(){enq(p-1)};$('#nx').onclick=function(){enq(p+1)};
+    document.querySelectorAll('[data-id]').forEach(function(b){b.onclick=function(){
+      var r=d.items.filter(function(x){return x._id===b.dataset.id})[0],dl=$('#dlg');
+      dl.innerHTML='<h2>'+esc(r.referenceNumber)+'</h2><p>'+esc(r.studentName)+' · '+esc(r.phone)+'<br>'+esc(r.email)+'<br>Batch: '+esc(r.preferredBatch)+'<br>'+esc(r.message)+'</p><form><label>Status<select name="status">'+
+      ['new','contacted','admitted','closed'].map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label><label>Follow-up date<input type="date" name="followUpAt" value="'+(r.followUpAt?r.followUpAt.slice(0,10):'')+'"></label><label>Internal notes<textarea name="internalNotes" rows="3" maxlength="2000">'+esc(r.internalNotes)+'</textarea></label><div class="err" id="derr"></div><button class="btn">Save</button> <button class="btn red" type="button" id="cl">Close</button></form>';
+      dl.showModal();$('#cl').onclick=function(){dl.close()};
+      dl.querySelector('form').onsubmit=function(e){e.preventDefault();
+        api('/api/admin/enquiries/'+r._id,{method:'PATCH',body:Object.fromEntries(new FormData(e.target))}).then(function(){dl.close();toast('Saved');enq(p)}).catch(function(x){$('#derr').textContent=x.message})}}});
+  }).catch(fail)}
+function crs(){api('/api/admin/courses').then(function(list){
+  $('#view').innerHTML='<h1>Courses</h1><div class="bar"><button class="btn" id="add">Add course</button></div><div class="clay wrap">'+
+  (list.length?'<table><tr><th>Title</th><th>Class</th><th>Fee (₹)</th><th>Published</th><th></th></tr>'+list.map(function(c){return '<tr><td>'+esc(c.title)+'</td><td>'+esc(c.targetClass)+'</td><td>'+esc(c.fee)+'</td><td>'+(c.isPublished?'Yes':'No')+'</td><td><button class="btn sm" data-e="'+esc(c._id)+'">Edit</button> <button class="btn sm red" data-d="'+esc(c._id)+'">Delete</button></td></tr>'}).join('')+'</table>':'<p>No courses yet. Add your first course.</p>')+'</div>';
+  $('#add').onclick=function(){form()};
+  document.querySelectorAll('[data-e]').forEach(function(b){b.onclick=function(){form(list.filter(function(c){return c._id===b.dataset.e})[0])}});
+  document.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){if(confirm('Delete this course permanently?'))
+    api('/api/admin/courses/'+b.dataset.d,{method:'DELETE'}).then(function(){toast('Deleted');crs()}).catch(function(x){toast(x.message)})}});
+}).catch(fail)}
+function form(c){
+  c=c||{};var dl=$('#dlg');
+  dl.innerHTML='<h2>'+(c._id?'Edit':'Add')+' course</h2><form><label>Title<input name="title" required maxlength="120" value="'+esc(c.title)+'"></label><label>Description<textarea name="description" rows="3" maxlength="600">'+esc(c.description)+'</textarea></label>'+
+  '<label>Subjects (comma separated)<input name="subjects" value="'+esc((c.subjects||[]).join(', '))+'"></label><label>Target class<input name="targetClass" value="'+esc(c.targetClass)+'"></label><label>Duration<input name="duration" value="'+esc(c.duration)+'"></label>'+
+  '<label>Indicative fee (₹)<input name="fee" type="number" min="0" value="'+esc(c.fee||0)+'"></label><label>Image URL (https)<input name="imageUrl" value="'+esc(c.imageUrl)+'"></label><label style="display:flex;gap:.5rem"><input type="checkbox" name="isPublished" style="width:auto"'+(c.isPublished?' checked':'')+'> Published</label><div class="err" id="derr"></div><button class="btn">Save</button> <button class="btn red" type="button" id="cl">Cancel</button></form>';
+  dl.showModal();$('#cl').onclick=function(){dl.close()};
+  dl.querySelector('form').onsubmit=function(e){e.preventDefault();
+    var f=e.target,b=Object.fromEntries(new FormData(f));b.isPublished=f.isPublished.checked;
+    api(c._id?'/api/admin/courses/'+c._id:'/api/admin/courses',{method:c._id?'PATCH':'POST',body:b}).then(function(){dl.close();toast('Saved');crs()}).catch(function(x){$('#derr').textContent=x.message})}
+}
+api('/api/admin/me').then(showApp).catch(showLogin);
+</script></body></html>`;
