@@ -712,7 +712,7 @@ app.delete('/api/admin/courses/:id', requireAdminRole, async (req, res) => {
 // ==========================================
 // PUBLIC PORTAL (Claymorphic Single-Page App)
 // ==========================================
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.send(`<!DOCTYPE html>
 <html lang="en">
