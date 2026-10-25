@@ -1378,4 +1378,6 @@ app.get('*', (req, res) => {
     renderQuestion();
   </script>
 </body>
-</html>
+</html>');
+});
+module.exports = app;
